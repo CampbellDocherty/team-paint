@@ -16,7 +16,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: yarn install
+        uses: borales/actions-yarn@v4
+        with: 
+          cmd: install
 
       - name: Run eslint
         run: yarn lint
@@ -29,14 +31,16 @@ jobs:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     container:
-      image: node:22
+      image: node:20.15.1
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: yarn install
+        uses: borales/actions-yarn@v4
+        with: 
+          cmd: install
 
       - name: test
         run: yarn test
@@ -48,14 +52,16 @@ jobs:
     env:
       NODE_ENV: production
     container:
-      image: node:22
+      image: node:20.15.1
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: yarn install
+        uses: borales/actions-yarn@v4
+        with: 
+          cmd: install
 
       - name: Build
         id: build
