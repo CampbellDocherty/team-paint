@@ -1,5 +1,5 @@
 const App = () => {
-  return <p>Frontend fork by Cammy!</p>;
+  return <p>Team Paint</p>;
 };
 
 export default App;
