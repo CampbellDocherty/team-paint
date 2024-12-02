@@ -16,7 +16,7 @@ type CustomML5HandPose = {
   detectStart: (h: p5.MediaElement, c: (r: CustomML5Hand[]) => void) => void;
 };
 
-type Colour = 'red' | 'green' | 'blue';
+export type Colour = 'red' | 'green' | 'blue';
 
 export const ColourSelect = (sketch: p5, colour: Colour) => {
   let handPose: CustomML5HandPose;
@@ -35,16 +35,20 @@ export const ColourSelect = (sketch: p5, colour: Colour) => {
 
   const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
+  const padding = 60;
+
   sketch.setup = async () => {
-    sketch.createCanvas(640, 480);
+    sketch.createCanvas(innerWidth / 4 + padding, innerHeight / 3 - 10);
 
     video = sketch.createCapture('video') as p5.MediaElement;
-    video.size(sketch.width, sketch.height);
+    video.size(sketch.width - padding, sketch.height);
     video.hide();
 
-    await delay(2000);
+    await delay(3000);
 
     handPose.detectStart(video, gotHands);
+
+    sketch.textSize(16);
   };
 
   function compileFill(c: number) {
@@ -57,9 +61,11 @@ export const ColourSelect = (sketch: p5, colour: Colour) => {
     }
   }
 
+  let previousColour = 0;
+
   sketch.draw = () => {
     sketch.background(220);
-    sketch.image(video, 0, 0, sketch.width, sketch.height);
+    sketch.image(video, 0, 0, sketch.width - padding, sketch.height);
 
     for (let i = 0; i < hands.length; i++) {
       const hand = hands[i];
@@ -71,12 +77,22 @@ export const ColourSelect = (sketch: p5, colour: Colour) => {
         indexFingerTip.y,
       );
 
-      const c = sketch.map(d, 0, 255, 0, sketch.height);
+      const c = sketch.round(sketch.map(d, 0, 255, 0, sketch.height));
 
       compileFill(c);
       sketch.noStroke();
       sketch.circle(thumbTip.x, thumbTip.y, 10);
       sketch.circle(indexFingerTip.x, indexFingerTip.y, 10);
+      const amount = sketch.noise(c / 1000);
+      const displayColour = sketch.lerp(previousColour, c, amount);
+      console.log(amount, displayColour);
+      sketch.text(
+        sketch.round(displayColour),
+        sketch.width - padding / 2,
+        sketch.height / 2,
+      );
+
+      previousColour = c;
     }
   };
 };
