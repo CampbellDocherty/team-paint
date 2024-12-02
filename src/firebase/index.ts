@@ -5,7 +5,6 @@ import {
   ref,
   getDownloadURL,
   getMetadata,
-  FullMetadata,
 } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -27,7 +26,6 @@ const listRef = ref(storage, `uploads/`);
 
 export type FirebaseStorageContent = {
   downloadUrl: string;
-  metadata: FullMetadata;
 };
 
 export const getFiles = async () => {
