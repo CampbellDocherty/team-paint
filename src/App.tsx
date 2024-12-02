@@ -18,7 +18,7 @@ const App = () => {
   return (
     <Container>
       <Title>Team Paint</Title>
-      <ReactP5Wrapper sketch={ColourSelect} />
+      <ReactP5Wrapper sketch={(p5) => ColourSelect(p5, 'green')} />
     </Container>
   );
 };

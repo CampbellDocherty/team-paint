@@ -16,11 +16,12 @@ type CustomML5HandPose = {
   detectStart: (h: p5.MediaElement, c: (r: CustomML5Hand[]) => void) => void;
 };
 
-export const ColourSelect = (sketch: p5) => {
+type Colour = 'red' | 'green' | 'blue';
+
+export const ColourSelect = (sketch: p5, colour: Colour) => {
   let handPose: CustomML5HandPose;
 
   sketch.preload = () => {
-    ml5.p5Utils.methodsToPreload['handPose'];
     handPose = ml5.handPose({ maxHands: 1 });
   };
 
@@ -32,15 +33,29 @@ export const ColourSelect = (sketch: p5) => {
     hands = results;
   }
 
-  sketch.setup = () => {
+  const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+
+  sketch.setup = async () => {
     sketch.createCanvas(640, 480);
 
     video = sketch.createCapture('video') as p5.MediaElement;
     video.size(sketch.width, sketch.height);
     video.hide();
 
+    await delay(2000);
+
     handPose.detectStart(video, gotHands);
   };
+
+  function compileFill(c: number) {
+    if (colour === 'red') {
+      sketch.fill(c, 0, 0);
+    } else if (colour == 'green') {
+      sketch.fill(0, c, 0);
+    } else {
+      sketch.fill(0, 0, c);
+    }
+  }
 
   sketch.draw = () => {
     sketch.background(220);
@@ -55,9 +70,10 @@ export const ColourSelect = (sketch: p5) => {
         indexFingerTip.x,
         indexFingerTip.y,
       );
-      const r = sketch.map(d, 0, 255, 0, sketch.height);
 
-      sketch.fill(r, 0, 0);
+      const c = sketch.map(d, 0, 255, 0, sketch.height);
+
+      compileFill(c);
       sketch.noStroke();
       sketch.circle(thumbTip.x, thumbTip.y, 10);
       sketch.circle(indexFingerTip.x, indexFingerTip.y, 10);
