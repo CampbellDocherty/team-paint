@@ -1,2 +1,1 @@
-Frontend with github actions for forking
-Just switch 'frontend-fork' to the name of your app and you should be good to go!
+A collaborative painting game made by Campbell Docherty for his Critical Coding final project.
