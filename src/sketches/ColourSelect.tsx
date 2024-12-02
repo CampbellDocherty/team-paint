@@ -20,12 +20,17 @@ export const ColourSelect = (sketch: p5) => {
   let handPose: CustomML5HandPose;
 
   sketch.preload = () => {
+    ml5.p5Utils.methodsToPreload['handPose'];
     handPose = ml5.handPose({ maxHands: 1 });
   };
 
   let video: p5.MediaElement;
 
   let hands: CustomML5Hand[] = [];
+
+  function gotHands(results: CustomML5Hand[]) {
+    hands = results;
+  }
 
   sketch.setup = () => {
     sketch.createCanvas(640, 480);
@@ -58,8 +63,4 @@ export const ColourSelect = (sketch: p5) => {
       sketch.circle(indexFingerTip.x, indexFingerTip.y, 10);
     }
   };
-
-  function gotHands(results: CustomML5Hand[]) {
-    hands = results;
-  }
 };
