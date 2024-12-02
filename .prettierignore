@@ -13,3 +13,5 @@ public/fonts
 yarn.lock
 .github/
 *.config.ts
+.yarn/
+.pnp.**

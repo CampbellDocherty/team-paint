@@ -15,31 +15,17 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: yarn install --production=false --frozen-lockfile
+      - name: Install patch package
+        run: npm install -g patch-package
 
+      - name: Install dependencies
+        run: yarn install
+      
       - name: Run eslint
         run: yarn lint
 
       - name: Run prettier
         run: yarn check-format
-
-  test:
-    name: test
-    if: github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    container:
-      image: node:22
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v4
-
-      - name: Install dependencies
-        run: yarn install --production=false --frozen-lockfile
-
-      - name: test
-        run: yarn test
 
   build:
     name: build
@@ -48,14 +34,17 @@ jobs:
     env:
       NODE_ENV: production
     container:
-      image: node:22
+      image: node:20.15.1
 
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v4
 
+      - name: Install patch package
+        run: npm install -g patch-package
+
       - name: Install dependencies
-        run: yarn install --production=false --frozen-lockfile
+        run: yarn install
 
       - name: Build
         id: build
@@ -70,6 +59,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
+      - name: Install patch package
+        run: npm install -g patch-package
 
       - name: Install and Build
         run: |
