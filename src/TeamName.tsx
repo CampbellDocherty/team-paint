@@ -1,6 +1,7 @@
 import { FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { styled } from 'styled-components';
+import { v4 as uuidv4 } from 'uuid';
 
 const Container = styled.div`
   width: 100%;
@@ -58,7 +59,9 @@ export const TeamName = () => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const formJson = Object.fromEntries(formData.entries()) as FormData;
+    const uuid = uuidv4();
     localStorage.setItem('teamName', formJson.teamName);
+    localStorage.setItem('teamId', uuid);
     navigate('/new');
   };
 
