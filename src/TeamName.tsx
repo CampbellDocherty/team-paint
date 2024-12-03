@@ -62,7 +62,7 @@ export const TeamName = () => {
     const uuid = uuidv4();
     localStorage.setItem('teamName', formJson.teamName);
     localStorage.setItem('teamId', uuid);
-    navigate('/new');
+    navigate('/training');
   };
 
   return (

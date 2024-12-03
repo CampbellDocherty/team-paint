@@ -40,11 +40,11 @@ export const NewGame = () => {
     <Container>
       <Title>Training</Title>
       <SketchWrapper>
-        <ReactP5Wrapper sketch={ColourSelect} />
+        <ReactP5Wrapper sketch={(p) => ColourSelect(p, true)} />
       </SketchWrapper>
       <Button
         onClick={() => {
-          navigate('/1');
+          navigate('/game-time');
         }}
       >
         Start

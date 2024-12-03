@@ -44,7 +44,7 @@ export class Hand {
     this.sketch.rect(x, y, 15);
 
     const rx = x + this.sketch.width / 2;
-    this.sketch.rect(rx, y, 30);
+    this.sketch.rect(rx - 100, y, 20);
   }
 
   draw(currentColour: { r: number; g: number; b: number }) {
