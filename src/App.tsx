@@ -1,8 +1,6 @@
-import { ReactP5Wrapper } from '@p5-wrapper/react';
-import { styled } from 'styled-components';
-import { ColourSelect } from './sketches/ColourSelect';
-import play from './assets/play.svg';
 import { Link } from 'react-router';
+import { styled } from 'styled-components';
+import play from './assets/play.svg';
 
 const Container = styled.div`
   width: 100%;
@@ -33,11 +31,10 @@ const App = () => {
     <Container>
       <Title>Team Paint</Title>
       <PlayButton>
-        <Link to="/new">
+        <Link to="/name">
           <img style={{ width: '100%' }} src={play} alt="Play button" />
         </Link>
       </PlayButton>
-      {/* <ReactP5Wrapper sketch={(p5) => ColourSelect(p5, 'green')} /> */}
     </Container>
   );
 };
