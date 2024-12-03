@@ -2,6 +2,7 @@ import { ReactP5Wrapper } from '@p5-wrapper/react';
 import { ColourSelect } from './sketches/ColourSelect';
 import { styled } from 'styled-components';
 import { useNavigate } from 'react-router';
+import flags from './assets/flags.json';
 
 const Container = styled.div`
   width: 100%;
@@ -22,33 +23,14 @@ const SketchWrapper = styled.div`
   margin: 30px 0px;
 `;
 
-const Button = styled.button`
-  border: none;
-  outline: 0.5px solid white;
-  cursor: pointer;
-  background-color: transparent;
-  color: white;
-  font-size: 18px;
-  font-family: 'Inconsolata';
-  padding: 4px;
-  min-width: 200px;
-`;
-
-export const NewGame = () => {
+export const Round = () => {
   const navigate = useNavigate();
   return (
     <Container>
-      <Title>Training</Title>
+      <Title>Game Time</Title>
       <SketchWrapper>
-        <ReactP5Wrapper sketch={(p) => ColourSelect(p, true)} />
+        <ReactP5Wrapper sketch={ColourSelect} />
       </SketchWrapper>
-      <Button
-        onClick={() => {
-          navigate('/round/1');
-        }}
-      >
-        Start
-      </Button>
     </Container>
   );
 };

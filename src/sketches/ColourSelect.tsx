@@ -2,6 +2,7 @@ import * as ml5 from 'ml5';
 import p5 from 'p5';
 import inconsolata from '../fonts/inconsolata.ttf';
 import { CustomML5Hand, Hand } from './Hand';
+import flagJson from '../assets/flags.json';
 
 type CustomML5HandPose = {
   detectStart: (h: p5.MediaElement, c: (r: CustomML5Hand[]) => void) => void;
@@ -9,11 +10,21 @@ type CustomML5HandPose = {
 
 export type Colour = 'red' | 'green' | 'blue';
 
-export const ColourSelect = (sketch: p5) => {
+export const ColourSelect = (sketch: p5, isTraining = false) => {
   let handPose: CustomML5HandPose;
   let font: p5.Font;
+  const flags: p5.Image[] = [];
+  const usedCountries: string[] = [];
 
   sketch.preload = () => {
+    if (!isTraining) {
+      for (let i = 0; i < 3; i++) {
+        const flagKeys = Object.keys(flagJson);
+        const country = flagKeys[Math.floor(Math.random() * flagKeys.length)];
+        usedCountries.push(country);
+        flags.push(sketch.loadImage(`https://flagcdn.com/w640/${country}.png`));
+      }
+    }
     font = sketch.loadFont(inconsolata);
     handPose = ml5.handPose({ maxHands: 4 });
   };
@@ -30,7 +41,7 @@ export const ColourSelect = (sketch: p5) => {
 
   let currentColour = { r: 0, g: 0, b: 0 };
 
-  const w = innerWidth / 2.5;
+  const w = innerWidth / 2.2;
 
   sketch.setup = async function setup() {
     sketch.createCanvas(w * 2, 480);
@@ -41,7 +52,7 @@ export const ColourSelect = (sketch: p5) => {
     video.size(sketch.width / 2, sketch.height);
     video.hide();
 
-    await delay(3000);
+    await delay(5000);
     isLoading = false;
 
     handPose.detectStart(video, gotHands);
@@ -49,6 +60,9 @@ export const ColourSelect = (sketch: p5) => {
     sketch.textSize(20);
     sketch.textAlign(sketch.CENTER);
   };
+
+  let flagIndex = 0;
+  let eventTime = 0;
 
   sketch.draw = () => {
     sketch.background(50, 0);
@@ -62,25 +76,41 @@ export const ColourSelect = (sketch: p5) => {
     sketch.push();
     sketch.noFill();
     sketch.stroke('white');
+    sketch.image(
+      flags[flagIndex],
+      sketch.width * 0.75 - 100,
+      0,
+      sketch.width / 4,
+      sketch.height / 2 - 20,
+    );
     sketch.rect(
-      sketch.width * 0.75,
+      sketch.width * 0.75 - 99,
+      0,
+      sketch.width / 4,
+      sketch.height / 2 - 20,
+    );
+
+    sketch.rect(
+      sketch.width * 0.75 - 100,
       sketch.height / 2,
       sketch.width / 4,
       sketch.height / 2,
     );
     sketch.pop();
 
-    sketch.push();
-    sketch.textAlign(sketch.RIGHT);
-    sketch.fill('white');
-    sketch.text('Instructions', sketch.width, 40);
-    sketch.text(
-      '- Hold your hand over a quadrant to take control',
-      sketch.width,
-      70,
-    );
-    sketch.text('- Close and open your hand to control', sketch.width, 100);
-    sketch.pop();
+    if (isTraining) {
+      sketch.push();
+      sketch.textAlign(sketch.RIGHT);
+      sketch.fill('white');
+      sketch.text('Instructions', sketch.width, 40);
+      sketch.text(
+        '- Hold your hand over a quadrant to take control',
+        sketch.width,
+        70,
+      );
+      sketch.text('- Close and open your hand to control', sketch.width, 100);
+      sketch.pop();
+    }
 
     sketch.push();
     sketch.fill('black');
@@ -113,6 +143,11 @@ export const ColourSelect = (sketch: p5) => {
     hands.forEach((hand) => {
       hand.draw(currentColour);
     });
+
+    if (sketch.millis() - eventTime > 30_000) {
+      flagIndex++;
+      eventTime = sketch.millis();
+    }
   };
 
   function setColour(newColour: { r?: number; g?: number; b?: number }) {
