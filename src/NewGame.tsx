@@ -44,7 +44,7 @@ export const NewGame = () => {
       </SketchWrapper>
       <Button
         onClick={() => {
-          navigate('/round/1');
+          navigate('/game-time');
         }}
       >
         Start

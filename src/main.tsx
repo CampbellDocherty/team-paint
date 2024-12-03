@@ -13,8 +13,8 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/name" element={<TeamName />} />
-        <Route path="/new" element={<NewGame />} />
-        <Route path="/round/:round" element={<Round />} />
+        <Route path="/training" element={<NewGame />} />
+        <Route path="/game-time" element={<Round />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

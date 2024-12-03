@@ -35,6 +35,7 @@ export const ColourSelect = (sketch: p5, isTraining = false) => {
 
   let isLoading = true;
 
+  const waitForML5 = 5000;
   const delay = (ms: number) => {
     return new Promise((res) => setTimeout(res, ms));
   };
@@ -52,43 +53,81 @@ export const ColourSelect = (sketch: p5, isTraining = false) => {
     video.size(sketch.width / 2, sketch.height);
     video.hide();
 
-    await delay(5000);
+    await delay(waitForML5);
     isLoading = false;
 
     handPose.detectStart(video, gotHands);
     sketch.textFont(font);
-    sketch.textSize(20);
+    sketch.textSize(24);
     sketch.textAlign(sketch.CENTER);
   };
 
   let flagIndex = 0;
   let eventTime = 0;
+  let elapsedTime;
+  let timer;
+  let endGame = false;
 
   sketch.draw = () => {
-    sketch.background(50, 0);
+    sketch.background(0, 0);
+    if (endGame) {
+      sketch.fill('white');
+      sketch.text('End', sketch.width / 2, sketch.height / 2);
+      return;
+    }
     if (isLoading) {
       sketch.fill('white');
       sketch.text('Loading...', sketch.width / 2, sketch.height / 2);
       return;
     }
+    elapsedTime = sketch.millis() - eventTime;
     sketch.image(video, 0, 0, sketch.width / 2, sketch.height);
 
     sketch.push();
     sketch.noFill();
     sketch.stroke('white');
-    sketch.image(
-      flags[flagIndex],
-      sketch.width * 0.75 - 100,
-      0,
-      sketch.width / 4,
-      sketch.height / 2 - 20,
-    );
-    sketch.rect(
-      sketch.width * 0.75 - 99,
-      0,
-      sketch.width / 4,
-      sketch.height / 2 - 20,
-    );
+
+    if (!isTraining && flags.length > 0) {
+      if (sketch.millis() - eventTime > 30_000) {
+        if (flagIndex === flags.length - 1) {
+          endGame = true;
+          return;
+        }
+        flagIndex++;
+        eventTime = sketch.millis();
+        sketch.clear();
+      }
+      timer = (30_000 - elapsedTime) / 1000;
+      sketch.push();
+      sketch.rectMode(sketch.CENTER);
+      sketch.stroke('black');
+      sketch.fill('black');
+      sketch.rect(sketch.width / 2 + 100, sketch.height / 2, 100);
+      sketch.pop();
+      sketch.push();
+      sketch.fill('white');
+      sketch.noStroke();
+      sketch.text(
+        sketch.ceil(timer),
+        sketch.width / 2 + 100,
+        sketch.height / 2,
+      );
+      sketch.pop();
+
+      sketch.image(
+        flags[flagIndex],
+        sketch.width * 0.75 - 100,
+        0,
+        sketch.width / 4,
+        sketch.height / 2 - 20,
+      );
+      sketch.rect(
+        sketch.width * 0.75 - 99,
+        0,
+        sketch.width / 4,
+        sketch.height / 2 - 20,
+      );
+    }
 
     sketch.rect(
       sketch.width * 0.75 - 100,
@@ -102,13 +141,17 @@ export const ColourSelect = (sketch: p5, isTraining = false) => {
       sketch.push();
       sketch.textAlign(sketch.RIGHT);
       sketch.fill('white');
-      sketch.text('Instructions', sketch.width, 40);
+      sketch.text('Instructions', sketch.width - 100, 40);
       sketch.text(
         '- Hold your hand over a quadrant to take control',
-        sketch.width,
+        sketch.width - 100,
         70,
       );
-      sketch.text('- Close and open your hand to control', sketch.width, 100);
+      sketch.text(
+        '- Close and open your hand to control',
+        sketch.width - 100,
+        100,
+      );
       sketch.pop();
     }
 
@@ -143,11 +186,6 @@ export const ColourSelect = (sketch: p5, isTraining = false) => {
     hands.forEach((hand) => {
       hand.draw(currentColour);
     });
-
-    if (sketch.millis() - eventTime > 30_000) {
-      flagIndex++;
-      eventTime = sketch.millis();
-    }
   };
 
   function setColour(newColour: { r?: number; g?: number; b?: number }) {

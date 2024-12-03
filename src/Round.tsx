@@ -1,8 +1,6 @@
 import { ReactP5Wrapper } from '@p5-wrapper/react';
-import { ColourSelect } from './sketches/ColourSelect';
 import { styled } from 'styled-components';
-import { useNavigate } from 'react-router';
-import flags from './assets/flags.json';
+import { ColourSelect } from './sketches/ColourSelect';
 
 const Container = styled.div`
   width: 100%;
@@ -24,7 +22,6 @@ const SketchWrapper = styled.div`
 `;
 
 export const Round = () => {
-  const navigate = useNavigate();
   return (
     <Container>
       <Title>Game Time</Title>
