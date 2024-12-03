@@ -70,7 +70,7 @@ export const ColourSelect = (sketch: p5) => {
     );
     sketch.pop();
 
-    sketch.pop();
+    sketch.push();
     sketch.textAlign(sketch.RIGHT);
     sketch.fill('white');
     sketch.text('Instructions', sketch.width, 40);
