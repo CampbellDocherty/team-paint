@@ -13,29 +13,38 @@ export type CustomML5Hand = {
 
 export class Hand {
   sketch;
-  hand;
+  ml5hand;
   setColour;
   role: 'r' | 'g' | 'b' | 'painter';
 
   constructor(
     sketch: p5,
-    hand: CustomML5Hand,
+    ml5Hand: CustomML5Hand,
     setColour: ({ r, g, b }: { r?: number; g?: number; b?: number }) => void,
   ) {
     this.sketch = sketch;
-    this.hand = hand;
+    this.ml5hand = ml5Hand;
     this.setColour = setColour;
     this.role = 'r';
   }
 
   drawPainter() {
-    const { index_finger_tip: indexFingerTip } = this.hand;
+    const { index_finger_tip: indexFingerTip } = this.ml5hand;
     const { x, y } = indexFingerTip;
 
     this.sketch.noStroke();
+    if (
+      x < this.sketch.width / 4 ||
+      x > this.sketch.width / 2 - 15 ||
+      y < this.sketch.height / 2 ||
+      y > this.sketch.height - 15
+    ) {
+      return;
+    }
     this.sketch.rect(x, y, 15);
 
-    this.sketch.rect(x + this.sketch.width / 2, y, 30);
+    const rx = x + this.sketch.width / 2;
+    this.sketch.rect(rx, y, 30);
   }
 
   draw(currentColour: { r: number; g: number; b: number }) {
@@ -145,7 +154,7 @@ export class Hand {
   }
 
   getBoundingBox() {
-    return this.hand.keypoints.reduce(
+    return this.ml5hand.keypoints.reduce(
       (acc, point) => {
         return {
           minX: Math.min(acc.minX, point.x),
