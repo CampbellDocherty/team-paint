@@ -5,6 +5,8 @@ import {
   ref,
   getDownloadURL,
   getMetadata,
+  uploadBytes,
+  uploadString,
 } from 'firebase/storage';
 
 const firebaseConfig = {
@@ -42,3 +44,26 @@ export const getFiles = async () => {
   const files: FirebaseStorageContent[] = await Promise.all(promisedFiles);
   return files;
 };
+
+export async function uploadBase64Image(
+  base64Image: string,
+  teamName: string | null,
+  teamId: string | null,
+) {
+  console.log(teamName, teamId);
+  if (!teamName || !teamId) {
+    return null;
+  }
+
+  const storageRef = ref(storage, `${teamId}/`);
+
+  const metadata = {
+    customMetadata: {
+      teamName,
+    },
+  };
+
+  await uploadString(storageRef, base64Image, 'data_url', metadata);
+
+  return true;
+}

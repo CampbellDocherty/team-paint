@@ -2,7 +2,9 @@ import * as ml5 from 'ml5';
 import p5 from 'p5';
 import inconsolata from '../fonts/inconsolata.ttf';
 import { CustomML5Hand, Hand } from './Hand';
-import flagJson from '../assets/flags.json';
+import { drawInstructions } from './drawInstructions';
+import { drawQuadrants } from './drawQuadrants';
+import { uploadBase64Image } from '../firebase';
 
 type CustomML5HandPose = {
   detectStart: (h: p5.MediaElement, c: (r: CustomML5Hand[]) => void) => void;
@@ -10,29 +12,17 @@ type CustomML5HandPose = {
 
 export type Colour = 'red' | 'green' | 'blue';
 
-export const ColourSelect = (sketch: p5, isTraining = false) => {
+export const ColourSelect = (sketch: p5) => {
   let handPose: CustomML5HandPose;
   let font: p5.Font;
-  const flags: p5.Image[] = [];
-  const usedCountries: string[] = [];
 
   sketch.preload = () => {
-    if (!isTraining) {
-      for (let i = 0; i < 3; i++) {
-        const flagKeys = Object.keys(flagJson);
-        const country = flagKeys[Math.floor(Math.random() * flagKeys.length)];
-        usedCountries.push(country);
-        flags.push(sketch.loadImage(`https://flagcdn.com/w640/${country}.png`));
-      }
-    }
     font = sketch.loadFont(inconsolata);
     handPose = ml5.handPose({ maxHands: 4 });
   };
 
   let video: p5.MediaElement;
-
   let hands: Hand[] = [];
-
   let isLoading = true;
 
   const waitForML5 = 5000;
@@ -41,151 +31,72 @@ export const ColourSelect = (sketch: p5, isTraining = false) => {
   };
 
   let currentColour = { r: 0, g: 0, b: 0 };
-
   const w = innerWidth / 2.2;
+  let graphics: p5.Graphics;
 
   sketch.setup = async function setup() {
     sketch.createCanvas(w * 2, 480);
+    sketch.textFont(font);
+    sketch.textSize(20);
     sketch.textAlign(sketch.CENTER);
-    sketch.textSize(16);
 
     video = sketch.createCapture('video') as p5.MediaElement;
     video.size(sketch.width / 2, sketch.height);
     video.hide();
 
+    graphics = sketch.createGraphics(sketch.width / 4, sketch.height / 2);
+
     await delay(waitForML5);
     isLoading = false;
 
     handPose.detectStart(video, gotHands);
-    sketch.textFont(font);
-    sketch.textSize(24);
-    sketch.textAlign(sketch.CENTER);
   };
 
-  let flagIndex = 0;
-  let eventTime = 0;
-  let elapsedTime;
-  let timer;
-  let endGame = false;
+  const saveButton = sketch.select('.save-image');
 
-  sketch.draw = () => {
-    sketch.background(0, 0);
-    if (endGame) {
-      sketch.fill('white');
-      sketch.text('End', sketch.width / 2, sketch.height / 2);
+  saveButton?.mouseClicked(async () => {
+    if (!graphics) {
       return;
     }
+    const graphicsCanvas = graphics.elt;
+    const dataURL = graphicsCanvas.toDataURL('image/png');
+
+    await uploadBase64Image(
+      dataURL,
+      localStorage.getItem('teamName'),
+      localStorage.getItem('teamId'),
+    );
+  });
+
+  sketch.draw = () => {
+    sketch.background(0);
+
     if (isLoading) {
       sketch.fill('white');
       sketch.text('Loading...', sketch.width / 2, sketch.height / 2);
       return;
     }
-    elapsedTime = sketch.millis() - eventTime;
+
     sketch.image(video, 0, 0, sketch.width / 2, sketch.height);
 
-    sketch.push();
-    sketch.noFill();
-    sketch.stroke('white');
+    graphics.push();
+    graphics.stroke('white');
+    graphics.noFill();
+    graphics.rect(0, 0, graphics.width, graphics.height);
+    graphics.pop();
 
-    if (!isTraining && flags.length > 0) {
-      if (sketch.millis() - eventTime > 30_000) {
-        if (flagIndex === flags.length - 1) {
-          endGame = true;
-          return;
-        }
-        flagIndex++;
-        eventTime = sketch.millis();
-        sketch.clear();
-      }
-      timer = (30_000 - elapsedTime) / 1000;
-      sketch.push();
-      sketch.rectMode(sketch.CENTER);
-      sketch.stroke('black');
-      sketch.fill('black');
-      sketch.rect(sketch.width / 2 + 100, sketch.height / 2, 100);
-      sketch.pop();
-      sketch.push();
-      sketch.fill('white');
-      sketch.noStroke();
-      sketch.text(
-        sketch.ceil(timer),
-        sketch.width / 2 + 100,
-        sketch.height / 2,
-      );
-      sketch.pop();
+    drawInstructions(sketch);
 
-      sketch.image(
-        flags[flagIndex],
-        sketch.width * 0.75 - 100,
-        0,
-        sketch.width / 4,
-        sketch.height / 2 - 20,
-      );
-      sketch.rect(
-        sketch.width * 0.75 - 99,
-        0,
-        sketch.width / 4,
-        sketch.height / 2 - 20,
-      );
-    }
-
-    sketch.rect(
-      sketch.width * 0.75 - 100,
-      sketch.height / 2,
-      sketch.width / 4,
-      sketch.height / 2,
-    );
-    sketch.pop();
-
-    if (isTraining) {
-      sketch.push();
-      sketch.textAlign(sketch.RIGHT);
-      sketch.fill('white');
-      sketch.text('Instructions', sketch.width - 100, 40);
-      sketch.text(
-        '- Hold your hand over a quadrant to take control',
-        sketch.width - 100,
-        70,
-      );
-      sketch.text(
-        '- Close and open your hand to control',
-        sketch.width - 100,
-        100,
-      );
-      sketch.pop();
-    }
-
-    sketch.push();
-    sketch.fill('black');
-    sketch.rect(sketch.width / 2, 0, 50, sketch.height);
-    sketch.pop();
-
-    sketch.push();
-    sketch.strokeWeight(1);
-    sketch.push();
-    sketch.fill('red');
-    sketch.circle(20, 20, 20);
-    sketch.pop();
-    sketch.push();
-    sketch.fill('green');
-    sketch.circle(sketch.width / 2 - 20, 20, 20);
-    sketch.pop();
-    sketch.push();
-    sketch.fill('blue');
-    sketch.circle(20, sketch.height - 20, 20);
-    sketch.pop();
-    sketch.push();
-    const { r, g, b } = currentColour;
-    sketch.fill(r, g, b);
-    sketch.circle(sketch.width / 2 - 20, sketch.height - 20, 20);
-    sketch.pop();
-    sketch.line(sketch.width / 4, 0, sketch.width / 4, sketch.height);
-    sketch.line(0, sketch.height / 2, sketch.width / 2, sketch.height / 2);
-    sketch.pop();
+    drawQuadrants(sketch, currentColour);
 
     hands.forEach((hand) => {
+      if (hand.role === 'painter') {
+        hand.graphicBuffer = graphics;
+      }
       hand.draw(currentColour);
     });
+
+    sketch.image(graphics, sketch.width * 0.75 - 100, sketch.height / 2);
   };
 
   function setColour(newColour: { r?: number; g?: number; b?: number }) {
