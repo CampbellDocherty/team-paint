@@ -8,7 +8,7 @@ import { TeamName } from './pages/TeamName';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={location.pathname}>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/name" element={<TeamName />} />
