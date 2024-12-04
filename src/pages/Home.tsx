@@ -3,6 +3,7 @@ import { styled } from 'styled-components';
 import play from '../assets/play.svg';
 import { Container, Title } from './styles';
 import { useGetImages } from './useGetTeams';
+import { isMobile } from 'react-device-detect';
 
 const PlayButton = styled.button`
   margin-top: 24px;
@@ -26,19 +27,25 @@ const TeamName = styled.p`
   font-family: Inconsolata;
   margin: 0;
   font-size: 20px;
+  text-align: center;
 `;
 
 const Home = () => {
   const { teams } = useGetImages();
+  isMobile;
 
   return (
     <Container>
       <Title>Team Paint</Title>
-      <PlayButton>
-        <Link to="/name">
-          <img style={{ width: '100%' }} src={play} alt="Play button" />
-        </Link>
-      </PlayButton>
+      {isMobile ? (
+        <TeamName>To play, come back on a bigger screen :)</TeamName>
+      ) : (
+        <PlayButton>
+          <Link to="/name">
+            <img style={{ width: '100%' }} src={play} alt="Play button" />
+          </Link>
+        </PlayButton>
+      )}
       {teams &&
         teams.map((team) => {
           const key = Object.keys(team)[0];
