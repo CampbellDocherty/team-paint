@@ -131,14 +131,13 @@ export const ColourSelect = (sketch: p5) => {
       drawInstructions(sketch);
 
       drawQuadrants(sketch, currentColour);
+      hands.forEach((hand) => {
+        if (hand.role === 'painter') {
+          hand.graphicBuffer = graphics;
+        }
+        hand.draw(currentColour);
+      });
     }
-
-    hands.forEach((hand) => {
-      if (hand.role === 'painter') {
-        hand.graphicBuffer = isSaving ? null : graphics;
-      }
-      hand.draw(currentColour);
-    });
   };
 
   function setColour(newColour: { r?: number; g?: number; b?: number }) {
