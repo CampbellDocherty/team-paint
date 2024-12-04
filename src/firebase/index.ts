@@ -50,7 +50,6 @@ export async function uploadBase64Image(
   teamName: string | null,
   teamId: string | null,
 ) {
-  console.log(teamName, teamId);
   if (!teamName || !teamId) {
     return null;
   }

@@ -36,9 +36,9 @@ const Button = styled.button`
 export const NewGame = () => {
   return (
     <Container>
-      <Title>Training</Title>
+      <Title>Casual</Title>
       <SketchWrapper>
-        <ReactP5Wrapper sketch={(p) => ColourSelect(p)} />
+        <ReactP5Wrapper sketch={ColourSelect} />
       </SketchWrapper>
       <Button className="save-image">Save</Button>
     </Container>
