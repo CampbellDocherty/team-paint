@@ -33,6 +33,8 @@ export const ColourSelect = (sketch: p5) => {
   let currentColour = { r: 0, g: 0, b: 0 };
   const w = innerWidth / 2.2;
   let graphics: p5.Graphics;
+  let photoGraphics: p5.Graphics;
+  let isSaving = false;
 
   sketch.setup = async function setup() {
     sketch.createCanvas(w * 2, 480);
@@ -45,6 +47,7 @@ export const ColourSelect = (sketch: p5) => {
     video.hide();
 
     graphics = sketch.createGraphics(sketch.width / 4, sketch.height / 2);
+    photoGraphics = sketch.createGraphics(video.width, video.height);
 
     await delay(waitForML5);
     isLoading = false;
@@ -52,24 +55,37 @@ export const ColourSelect = (sketch: p5) => {
     handPose.detectStart(video, gotHands);
   };
 
-  const saveButton = sketch.select('.save-image');
+  let isFinished = false;
+  let eventTime = 0;
 
+  const saveButton = sketch.select('.save-image');
   saveButton?.mouseClicked(async () => {
     if (!graphics) {
       return;
     }
+    saveButton.hide();
     const graphicsCanvas = graphics.elt;
     const dataURL = graphicsCanvas.toDataURL('image/png');
-
-    await uploadBase64Image(
-      dataURL,
-      'painting',
-      localStorage.getItem('teamName'),
-      localStorage.getItem('teamId'),
-    );
+    const teamName = localStorage.getItem('teamName');
+    const teamId = localStorage.getItem('teamId');
+    await uploadBase64Image(dataURL, 'painting', teamName, teamId);
+    isSaving = true;
+    eventTime = sketch.millis();
   });
 
-  sketch.draw = () => {
+  const doneButton = sketch.select('.done');
+  async function takePhoto() {
+    photoGraphics = sketch.createGraphics(video.width, video.height);
+    photoGraphics.image(video, 0, 0, video.width, video.height);
+    isFinished = true;
+    const dataURL = photoGraphics.elt.toDataURL('image/png');
+    const teamName = localStorage.getItem('teamName');
+    const teamId = localStorage.getItem('teamId');
+    await uploadBase64Image(dataURL, 'team-photo', teamName, teamId);
+    doneButton?.show();
+  }
+
+  sketch.draw = async () => {
     sketch.background(0);
 
     if (isLoading) {
@@ -78,26 +94,51 @@ export const ColourSelect = (sketch: p5) => {
       return;
     }
 
-    sketch.image(video, 0, 0, sketch.width / 2, sketch.height);
+    if (isFinished) {
+      sketch.image(photoGraphics, 0, 0, sketch.width / 2, sketch.height);
+    } else {
+      sketch.image(video, 0, 0, sketch.width / 2, sketch.height);
+    }
+
+    if (isSaving && !isFinished) {
+      const elapsedTime = sketch.millis() - eventTime;
+      const timer = (5000 - elapsedTime) / 1000;
+
+      sketch.push();
+      sketch.fill('white');
+      sketch.textSize(28);
+      sketch.text(
+        'Taking team photo in:',
+        sketch.width / 4,
+        sketch.height / 2 - 50,
+      );
+      sketch.text(sketch.ceil(timer), sketch.width / 4, sketch.height / 2 + 50);
+      sketch.pop();
+
+      if (timer < 0) {
+        await takePhoto();
+      }
+    }
 
     graphics.push();
     graphics.stroke('white');
     graphics.noFill();
     graphics.rect(0, 0, graphics.width, graphics.height);
     graphics.pop();
+    sketch.image(graphics, sketch.width * 0.75 - 100, sketch.height / 2);
 
-    drawInstructions(sketch);
+    if (!isSaving) {
+      drawInstructions(sketch);
 
-    drawQuadrants(sketch, currentColour);
+      drawQuadrants(sketch, currentColour);
+    }
 
     hands.forEach((hand) => {
       if (hand.role === 'painter') {
-        hand.graphicBuffer = graphics;
+        hand.graphicBuffer = isSaving ? null : graphics;
       }
       hand.draw(currentColour);
     });
-
-    sketch.image(graphics, sketch.width * 0.75 - 100, sketch.height / 2);
   };
 
   function setColour(newColour: { r?: number; g?: number; b?: number }) {
