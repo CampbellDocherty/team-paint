@@ -16,6 +16,7 @@ export class Hand {
   ml5hand;
   setColour;
   role: 'r' | 'g' | 'b' | 'painter';
+  graphicBuffer: p5.Graphics | null = null;
 
   constructor(
     sketch: p5,
@@ -28,7 +29,10 @@ export class Hand {
     this.role = 'r';
   }
 
-  drawPainter() {
+  drawPainter(currentColour: { r: number; g: number; b: number }) {
+    this.sketch.push();
+    const { r, g, b } = currentColour;
+    this.sketch.fill(r, g, b);
     const { index_finger_tip: indexFingerTip } = this.ml5hand;
     const { x, y } = indexFingerTip;
 
@@ -43,19 +47,22 @@ export class Hand {
     }
     this.sketch.rect(x, y, 15);
 
-    const rx = x + this.sketch.width / 2;
-    this.sketch.rect(rx - 100, y, 20);
+    if (this.graphicBuffer) {
+      this.graphicBuffer.noStroke();
+      this.graphicBuffer.fill(r, g, b);
+      const graphicsX = x - this.sketch.width / 4;
+      const graphicsY = y - this.sketch.height / 2;
+      this.graphicBuffer.rect(graphicsX, graphicsY, 20);
+    }
+
+    this.sketch.pop();
   }
 
   draw(currentColour: { r: number; g: number; b: number }) {
     this.setRoleFromAveragePosition();
 
     if (this.role === 'painter') {
-      this.sketch.push();
-      const { r, g, b } = currentColour;
-      this.sketch.fill(r, g, b);
-      this.drawPainter();
-      this.sketch.pop();
+      this.drawPainter(currentColour);
     } else {
       const { minX, maxX, minY, maxY } = this.getBoundingBox();
 
