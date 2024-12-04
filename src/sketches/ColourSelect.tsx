@@ -64,12 +64,12 @@ export const ColourSelect = (sketch: p5) => {
       return;
     }
     saveButton.hide();
+    isSaving = true;
     const graphicsCanvas = graphics.elt;
     const dataURL = graphicsCanvas.toDataURL('image/png');
     const teamName = localStorage.getItem('teamName');
     const teamId = localStorage.getItem('teamId');
     await uploadBase64Image(dataURL, 'painting', teamName, teamId);
-    isSaving = true;
     eventTime = sketch.millis();
   });
 
