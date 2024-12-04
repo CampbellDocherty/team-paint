@@ -63,6 +63,7 @@ export const ColourSelect = (sketch: p5) => {
 
     await uploadBase64Image(
       dataURL,
+      'painting',
       localStorage.getItem('teamName'),
       localStorage.getItem('teamId'),
     );

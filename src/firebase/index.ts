@@ -47,6 +47,7 @@ export const getFiles = async () => {
 
 export async function uploadBase64Image(
   base64Image: string,
+  imageName: string,
   teamName: string | null,
   teamId: string | null,
 ) {
@@ -54,7 +55,7 @@ export async function uploadBase64Image(
     return null;
   }
 
-  const storageRef = ref(storage, `${teamId}/`);
+  const storageRef = ref(storage, `${teamId}/${imageName}`);
 
   const metadata = {
     customMetadata: {
