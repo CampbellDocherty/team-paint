@@ -72,7 +72,5 @@ export async function uploadBase64Image(
 
   await uploadString(storageRef, base64Image, 'data_url', metadata);
 
-  console.log('Uploaded');
-
   return true;
 }
