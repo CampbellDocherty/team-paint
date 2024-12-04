@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { BrowserRouter, Route, Routes } from 'react-router';
 import App from './App';
-import { BrowserRouter, Routes, Route } from 'react-router';
 import './index.css';
-import { NewGame } from './NewGame';
+import { Casual } from './NewGame';
 import { TeamName } from './TeamName';
-import { Round } from './Round';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
@@ -13,8 +12,7 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/name" element={<TeamName />} />
-        <Route path="/training" element={<NewGame />} />
-        <Route path="/game-time" element={<Round />} />
+        <Route path="/casual" element={<Casual />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,

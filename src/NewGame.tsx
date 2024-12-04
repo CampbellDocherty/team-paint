@@ -33,7 +33,7 @@ const Button = styled.button`
   min-width: 200px;
 `;
 
-export const NewGame = () => {
+export const Casual = () => {
   return (
     <Container>
       <Title>Casual</Title>
