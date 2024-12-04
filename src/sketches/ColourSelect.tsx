@@ -10,8 +10,6 @@ type CustomML5HandPose = {
   detectStart: (h: p5.MediaElement, c: (r: CustomML5Hand[]) => void) => void;
 };
 
-export type Colour = 'red' | 'green' | 'blue';
-
 export const ColourSelect = (sketch: p5) => {
   let handPose: CustomML5HandPose;
   let font: p5.Font;
