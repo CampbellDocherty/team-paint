@@ -23,7 +23,7 @@ const TeamContainer = styled.div`
   margin-top: 56px;
 `;
 
-const TeamName = styled.p`
+const Text = styled.p`
   font-family: Inconsolata;
   margin: 0;
   font-size: 20px;
@@ -32,13 +32,12 @@ const TeamName = styled.p`
 
 const Home = () => {
   const { teams } = useGetImages();
-  isMobile;
 
   return (
     <Container>
       <Title>Team Paint</Title>
       {isMobile ? (
-        <TeamName>To play, come back on a bigger screen :)</TeamName>
+        <Text>To play, come back on a bigger screen :)</Text>
       ) : (
         <PlayButton>
           <Link to="/name">
@@ -53,7 +52,7 @@ const Home = () => {
           const teamName = images[0].metadata.customMetadata?.['teamName'];
           return (
             <TeamContainer key={key}>
-              <TeamName>{teamName}</TeamName>
+              <Text>{teamName}</Text>
               {images.map((image) => {
                 return (
                   <img
