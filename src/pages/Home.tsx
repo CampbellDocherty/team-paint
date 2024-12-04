@@ -1,21 +1,7 @@
 import { Link } from 'react-router';
 import { styled } from 'styled-components';
-import play from './assets/play.svg';
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  min-height: ${innerHeight}px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding-top: 16px;
-`;
-
-const Title = styled.h1`
-  font-family: 'Inconsolata';
-  font-size: 24px;
-`;
+import play from '../assets/play.svg';
+import { Container, Title } from './styles';
 
 const PlayButton = styled.button`
   margin-top: 24px;
@@ -26,7 +12,7 @@ const PlayButton = styled.button`
   cursor: pointer;
 `;
 
-const App = () => {
+const Home = () => {
   return (
     <Container>
       <Title>Team Paint</Title>
@@ -39,4 +25,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Home;

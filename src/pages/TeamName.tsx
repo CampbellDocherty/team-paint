@@ -2,21 +2,7 @@ import { FormEvent } from 'react';
 import { useNavigate } from 'react-router';
 import { styled } from 'styled-components';
 import { v4 as uuidv4 } from 'uuid';
-
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  min-height: ${innerHeight}px;
-  display: flex;
-  align-items: center;
-  flex-direction: column;
-  padding-top: 16px;
-`;
-
-const Title = styled.h1`
-  font-family: 'Inconsolata';
-  font-size: 24px;
-`;
+import { Button, Container, Title } from './styles';
 
 const Form = styled.form`
   display: flex;
@@ -37,17 +23,6 @@ const Input = styled.input`
   text-align: center;
 `;
 
-const Button = styled.button`
-  border: none;
-  outline: 0.5px solid white;
-  cursor: pointer;
-  background-color: transparent;
-  color: white;
-  font-size: 18px;
-  font-family: 'Inconsolata';
-  padding: 4px;
-`;
-
 type FormData = {
   teamName: string;
 };
@@ -62,7 +37,7 @@ export const TeamName = () => {
     const uuid = uuidv4();
     localStorage.setItem('teamName', formJson.teamName);
     localStorage.setItem('teamId', uuid);
-    navigate('/training');
+    navigate('/casual');
   };
 
   return (

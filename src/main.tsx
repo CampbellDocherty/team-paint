@@ -1,20 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import { BrowserRouter, Routes, Route } from 'react-router';
+import { BrowserRouter, Route, Routes } from 'react-router';
+import Home from './pages/Home';
 import './index.css';
-import { NewGame } from './NewGame';
-import { TeamName } from './TeamName';
-import { Round } from './Round';
+import { Casual } from './pages/Casual';
+import { TeamName } from './pages/TeamName';
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<App />} />
+        <Route path="/" element={<Home />} />
         <Route path="/name" element={<TeamName />} />
-        <Route path="/training" element={<NewGame />} />
-        <Route path="/game-time" element={<Round />} />
+        <Route path="/casual" element={<Casual />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>,
