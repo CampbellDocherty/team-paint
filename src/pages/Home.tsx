@@ -2,6 +2,7 @@ import { Link } from 'react-router';
 import { styled } from 'styled-components';
 import play from '../assets/play.svg';
 import { Container, Title } from './styles';
+import { useGetImages } from './useGetTeams';
 
 const PlayButton = styled.button`
   margin-top: 24px;
@@ -13,6 +14,8 @@ const PlayButton = styled.button`
 `;
 
 const Home = () => {
+  useGetImages();
+
   return (
     <Container>
       <Title>Team Paint</Title>
